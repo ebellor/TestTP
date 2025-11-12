@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test de Orientación TP — Liceo Bicentenario Industrial Ricardo Fenner Ruedi</title>
+  <!-- Opcional: EmailJS solo si decides usarlo como método de envío (ver constantes abajo) -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    :root{
+      --bg:#0f172a; --card:#111827; --ink:#e5e7eb; --muted:#9ca3af; --brand:#f59e0b;
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --link:#60a5fa; --chip:#1f2937;
+    }
+    html,body{height:100%}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif; background:linear-gradient(180deg,#0b1024,var(--bg)); color:var(--ink)}
+    header{position:sticky; top:0; z-index:20; backdrop-filter: blur(8px); background: rgba(17,24,39,.7); border-bottom:1px solid rgba(255,255,255,.06)}
+    .wrap{max-width:1100px; margin:auto; padding:20px}
+    .hero{display:grid; grid-template-columns:1.2fr .8fr; gap:24px; align-items:center}
+    .card{background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    h1{font-size:clamp(1.6rem,3.2vw,2.4rem); margin:.4rem 0 0.6rem}
+    h2{font-size:1.25rem; margin:0 0 8px}
+    h3{font-size:1.05rem; margin:18px 0 8px}
+    p{opacity:.9}
+    .muted{color:var(--muted)}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{appearance:none; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg,#1f2937,#111827); color:white; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600}
+    .btn.primary{background:linear-gradient(180deg,#f59e0b,#b45309); border-color:#b45309; color:#111827}
+    .btn.ghost{background:transparent}
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{background:var(--chip); border-radius:999px; padding:6px 10px; font-size:.85rem; color:var(--muted); border:1px solid rgba(255,255,255,.06)}
+    .grid{display:grid; gap:16px}
+    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+    @media (max-width:940px){ .hero{grid-template-columns:1fr} .grid.cols-3{grid-template-columns:1fr} }
+
+    .section-title{display:flex; align-items:center; gap:10px; margin:6px 0 12px}
+    .section-title b{color:var(--brand)}
+    .progress{height:10px; background:#0b1226; border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,.06)}
+    .progress>i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--brand),#fbbf24)}
+
+    .q{padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.02)}
+    .q .q-head{display:flex; justify-content:space-between; align-items:center; gap:12px}
+    .q .q-body{margin-top:10px}
+    .likert{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
+    .likert label{display:flex; flex-direction:column; align-items:center; gap:6px; font-size:.9rem; color:var(--muted)}
+    .likert input{width:20px; height:20px}
+    .options{display:grid; gap:8px}
+
+    .results{display:grid; gap:16px}
+    .bar{height:14px; background:#0b1226; border-radius:8px; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.06)}
+    .bar i{position:absolute; inset:0; width:0%; background:linear-gradient(90deg,#22d3ee,#0284c7)}
+
+    .tag{font-weight:700; letter-spacing:.4px}
+    .tag.alta{color:var(--ok)}
+    .tag.buena{color:#a3e635}
+    .tag.explo{color:var(--warn)}
+    .tag.baja{color:var(--bad)}
+
+    .top3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    .top3 .tcard{border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); border-radius:14px; padding:12px}
+    .tcard h4{margin:0 0 6px}
+    .small{font-size:.85rem; color:var(--muted)}
+
+    .notice{padding:10px 12px; border-radius:10px; background:rgba(245,158,11,.12); border:1px dashed rgba(245,158,11,.45)}
+    .footer{margin:40px 0 20px; text-align:center; color:var(--muted); font-size:.9rem}
+    .danger{outline:2px solid var(--bad); border-radius:8px}
+    .okmsg{color:var(--ok); font-weight:600}
+    .errmsg{color:var(--bad); font-weight:600}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; gap:16px">
+      <div>
+        <div class="muted" style="font-weight:600; letter-spacing:.5px">Liceo Bicentenario Industrial Ingeniero Ricardo Fenner Ruedi</div>
+        <h1 style="margin:2px 0 0">Test de Orientación TP</h1>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="window.print()">Imprimir / Guardar PDF</button>
+        <button class="btn primary" onclick="scrollToEl('#test')">Hacer el test</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" style="display:grid; gap:24px; margin-top:16px">
+    <section class="hero">
+      <div class="card">
+        <h2>Descubre tu <span style="color:var(--brand)">Top 3</span> de especialidades</h2>
+        <p>Responde intereses, habilidades, mini‑conocimientos y situaciones. Al final verás tu afinidad con **CM, IS, ED, EL, MA**, tu semáforo y el <b>Top 3</b>.</p>
+        <div class="chips" style="margin:12px 0 0">
+          <span class="chip">Orientativo, no selectivo</span>
+          <span class="chip">Seguridad & calidad</span>
+          <span class="chip">Trabajo colaborativo</span>
+        </div>
+        <div style="height:12px"></div>
+        <div class="notice">Tus respuestas son confidenciales. Úsalo para conversar con docentes, visitar talleres y decidir con tranquilidad.</div>
+      </div>
+      <div class="card">
+        <div class="section-title"><b>Progreso</b> <span class="muted" id="progText">0/50 respondidas</span></div>
+        <div class="progress"><i id="progBar"></i></div>
+        <div style="height:10px"></div>
+        <form id="testForm" onsubmit="handleSubmit(event)">
+          <div class="grid cols-2">
+            <div>
+              <label class="muted">Nombre</label>
+              <input id="nombre" class="q" style="width:100%; background:transparent; color:var(--ink); border-color:rgba(255,255,255,.14)" placeholder="Nombre y apellido" required />
+            </div>
+            <div>
+              <label class="muted">Curso</label>
+              <select id="curso" class="q" style="width:100%; background:transparent; color:var(--ink); border-color:rgba(255,255,255,.14)" required>
+                <option value="" disabled selected>Selecciona tu curso</option>
+                <option>2° A</option>
+                <option>2° B</option>
+                <option>2° C</option>
+                <option>2° D</option>
+                <option>2° E</option>
+                <option>2° F</option>
+                <option>2° G</option>
+              </select>
+            </div>
+            <div>
+              <label class="muted">Email</label>
+              <input id="email" type="email" class="q" style="width:100%; background:transparent; color:var(--ink); border-color:rgba(255,255,255,.14)" placeholder="nombre@correo.cl" required />
+            </div>
+            <div class="row" style="align-items:end; gap:10px">
+              <button type="button" class="btn" onclick="saveJSON()">Exportar respuestas (JSON)</button>
+              <button type="button" class="btn ghost" onclick="resetAll()">Borrar todo</button>
+            </div>
+          </div>
+
+          <section id="test" class="card" style="margin-top:16px">
+            <div class="section-title"><b>Parte A</b> <span class="muted">Intereses y motivaciones (1–5)</span></div>
+            <div id="parteA" class="grid" style="gap:10px"></div>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,.08); margin:16px 0">
+            <div class="section-title"><b>Parte B</b> <span class="muted">Habilidades auto‑percibidas (1–5)</span></div>
+            <div id="parteB" class="grid" style="gap:10px"></div>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,.08); margin:16px 0">
+            <div class="section-title"><b>Parte C</b> <span class="muted">Mini‑conocimientos (alternativa única)</span></div>
+            <div id="parteC" class="grid" style="gap:10px"></div>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,.08); margin:16px 0">
+            <div class="section-title"><b>Parte D</b> <span class="muted">Situaciones reales (elige lo que harías primero)</span></div>
+            <div id="parteD" class="grid" style="gap:10px"></div>
+          </section>
+
+          <section class="card" style="margin-top:16px">
+            <div class="row" style="justify-content:space-between; align-items:center">
+              <div class="section-title"><b>Resultados</b> <span class="muted">A+B+C (+2 correctas) + D (+3 preferencia)</span></div>
+              <div class="row">
+                <button id="calcBtn" class="btn" type="submit">Calcular y enviar</button>
+                <button class="btn primary" type="button" onclick="scrollToEl('#resumen')">Ver resumen</button>
+              </div>
+            </div>
+
+            <div id="resumen" class="results">
+              <div class="grid cols-3">
+                <div class="q">
+                  <h3 style="margin-top:0">Puntajes por especialidad</h3>
+                  <div id="scores"></div>
+                </div>
+                <div class="q">
+                  <h3 style="margin-top:0">Semáforo</h3>
+                  <div id="semaforos"></div>
+                </div>
+                <div class="q">
+                  <h3 style="margin-top:0">Preferencias Parte D</h3>
+                  <div id="dprefs"></div>
+                </div>
+              </div>
+
+              <div class="q">
+                <h3 style="margin-top:0">Top 3 recomendado</h3>
+                <div class="top3" id="top3"></div>
+                <div class="small" style="margin-top:8px">* Empates se resuelven con preferencia de la Parte D.</div>
+                <div id="sendStatus" style="margin-top:8px"></div>
+              </div>
+            </div>
+          </section>
+        </form>
+      </div>
+    </section>
+
+    <div class="footer">© Liceo Bicentenario Industrial Ingeniero Ricardo Fenner Ruedi — Herramienta orientativa. Construyamos tu futuro técnico con propósito.</div>
+  </main>
+
+<script>
+  // ===== Configuración de envío por correo =====
+  // Opción A (recomendada): Apps Script WebApp. Publica un endpoint (ver comentario al final)
+  const EMAIL_ENDPOINT = ""; // Coloca aquí tu URL de Apps Script desplegado (doPost)
+  // Opción B: EmailJS (cliente) — activa y completa credenciales si prefieres este método
+  const EMAILJS_CONF = { ENABLED:false, SERVICE_ID:"", TEMPLATE_ID:"", PUBLIC_KEY:"" };
+  const EMAIL_TO = "ebellor@industrialfenner.cl"; // correo destino solicitado
+
+  // ====== Datos base (sin mostrar especialidades en las preguntas) ======
+  const SPEC = {
+    CM: { name: 'Construcciones Metálicas' },
+    IS: { name: 'Instalaciones Sanitarias' },
+    ED: { name: 'Edificación' },
+    EL: { name: 'Electricidad' },
+    MA: { name: 'Mecánica Automotriz' },
+  };
+
+  const A_ITEMS = [
+    [1,'Disfruto medir, trazar y cortar piezas para que calcen al milímetro.','CM'],
+    [2,'Me atrae armar estructuras resistentes (rejas, marcos, soportes).','CM'],
+    [3,'Puedo imaginar cómo doblar o soldar una pieza para que cumpla una función.','CM'],
+    [4,'Me fijo en ángulos, escuadras y alineación cuando construyo.','CM'],
+    [5,'Me interesa cómo circula el agua y diseñar recorridos eficientes.','IS'],
+    [6,'Me gusta instalar y sellar cañerías sin filtraciones.','IS'],
+    [7,'Puedo interpretar símbolos básicos de gasfitería/sanitarios.','IS'],
+    [8,'Me entretiene calcular pendientes para que el agua evacue bien.','IS'],
+    [9,'Me gusta leer planos y visualizar un espacio terminado.','ED'],
+    [10,'Disfruto planificar etapas de construcción y coordinar tareas.','ED'],
+    [11,'Soy bueno detectando riesgos en obra y proponiendo medidas.','ED'],
+    [12,'Me importan la estética y funcionalidad de un espacio.','ED'],
+    [13,'Me interesa armar circuitos y entender por qué enciende/apaga.','EL'],
+    [14,'Me atrae el orden en canalizaciones y tableros.','EL'],
+    [15,'Disfruto resolver fallas eléctricas buscando causas.','EL'],
+    [16,'Me gusta trabajar con multímetro y seguir esquemas.','EL'],
+    [17,'Me fascina cómo funcionan motores y transmisiones.','MA'],
+    [18,'Disfruto desarmar y volver a armar mecanismos.','MA'],
+    [19,'Me gusta diagnosticar ruidos o vibraciones de un vehículo.','MA'],
+    [20,'Me interesa el mantenimiento preventivo y la seguridad en taller.','MA'],
+  ];
+
+  const B_ITEMS = [
+    [21,'Tengo buena coordinación ojo‑mano para trabajos finos.','CM'],
+    [22,'Mantengo medidas exactas con huincha/escuadra.','CM'],
+    [23,'Puedo soldar/pegar con prolijidad o aprendo rápido.','CM'],
+    [24,'Identifico diámetros de tuberías y fittings con facilidad.','IS'],
+    [25,'Puedo sellar uniones ordenadas y revisar fugas con método.','IS'],
+    [26,'Sé usar nivel (manguera/burbuja) y marcar pendientes.','IS'],
+    [27,'Organizo equipos y tiempos para cumplir una meta.','ED'],
+    [28,'Redacto instrucciones claras y hago checklists.','ED'],
+    [29,'Identifico materiales adecuados para cada etapa.','ED'],
+    [30,'Distingo serie vs. paralelo en lo básico.','EL'],
+    [31,'Trabajo seguro: corto energía, etiqueto y verifico.','EL'],
+    [32,'Sigo planos eléctricos sin perderme.','EL'],
+    [33,'Uso herramientas de mano y cuido torques/aprietes.','MA'],
+    [34,'Sigo secuencias de desmontaje sin “sobrar piezas”.','MA'],
+    [35,'Detecto síntomas (temperatura, olores, ruidos) y saco hipótesis.','MA'],
+  ];
+
+  const C_ITEMS = [
+    { n:1, spec:'EL', text:'En un circuito en serie, si se abre un interruptor, la corriente…', opts:{A:'Aumenta', B:'Disminuye a la mitad', C:'Se interrumpe', D:'Pasa por una parte'}, key:'C' },
+    { n:2, spec:'IS', text:'Para que un desagüe funcione por gravedad, la pendiente debe ser…', opts:{A:'0%', B:'Muy alta', C:'Moderada y constante', D:'Negativa'}, key:'C' },
+    { n:3, spec:'CM', text:'Para verificar 90° entre dos piezas, se usa:', opts:{A:'Pie de rey', B:'Escuadra metálica', C:'Llave ajustable', D:'Alicate'}, key:'B' },
+    { n:4, spec:'MA', text:'El torque correcto en una tuerca evita:', opts:{A:'Aumentar potencia', B:'Aflojamientos/sobreapriete', C:'Consumo', D:'Vel. máxima'}, key:'B' },
+    { n:5, spec:'ED', text:'En un plano escala 1:50:', opts:{A:'1 cm plano = 50 cm reales', B:'1 cm real = 50 cm plano', C:'50 cm plano = 1 cm real', D:'Igual a 1:5'}, key:'A' },
+    { n:6, spec:'EL', text:'Un multímetro en voltaje DC se conecta…', opts:{A:'En serie', B:'En paralelo', C:'Solo a tierra', D:'Como sea'}, key:'B' },
+    { n:7, spec:'IS', text:'El teflón/cáñamo se usa para…', opts:{A:'Aumentar caudal', B:'Evitar corrosión', C:'Sellar roscas', D:'Pegar PVC'}, key:'C' },
+    { n:8, spec:'CM', text:'Para marcar un corte recto largo en plancha conviene:', opts:{A:'Flexómetro curvo', B:'Regla/guía larga + marcador', C:'Pinza', D:'Martillo'}, key:'B' },
+    { n:9, spec:'ED', text:'EPP obligatorio al cortar con sierra:', opts:{A:'Guantes de lana', B:'Lentes + protección auditiva', C:'Sandalias', D:'Gorro'}, key:'B' },
+    { n:10, spec:'MA', text:'Un auto tira a la derecha al frenar:', opts:{A:'Alternador', B:'Desalineación/freno der. más fuerte', C:'Batería', D:'Bujías'}, key:'B' },
+  ];
+
+  const D_ITEMS = [
+    { n:1, text:'Soporte para señal en la plaza del liceo:', map:{A:'CM',B:'IS',C:'ED',D:'EL',E:'MA'}, opts:{A:'Diseñar y soldar un marco firme',B:'Medir pendientes y evacuar aguas',C:'Dibujar plano con ubicación/anclajes',D:'Calcular alimentación e iluminación',E:'Revisar herramientas y aprietes'} },
+    { n:2, text:'Corte en circuito de enchufes en casa:', map:{A:'EL',B:'ED',C:'CM',D:'MA',E:'IS'}, opts:{A:'Verificar continuidad / protección',B:'Ordenar canalización y cargas',C:'Hacer soporte metálico a canaletas',D:'Revisar aprietes en tablero',E:'Ver si agua/humedad afecta'} },
+    { n:3, text:'Tubería rota en el patio:', map:{A:'IS',B:'CM',C:'ED',D:'EL',E:'MA'}, opts:{A:'Cerrar llave y hacer by‑pass',B:'Abrazadera metálica provisional',C:'Evaluar daños y actualizar plano',D:'Proteger cables/energía del sector',E:'Revisar bomba/motor por daños'} },
+    { n:4, text:'Rampa para cargar materiales al camión:', map:{A:'CM',B:'ED',C:'MA',D:'EL',E:'IS'}, opts:{A:'Diseñar estructura y refuerzos',B:'Pendiente, barandas y flujo',C:'Chequear frenos del camión',D:'Iluminación y alarma de retroceso',E:'Drenaje superficial para lluvia'} },
+    { n:5, text:'Auto del taller no parte tras 2 meses:', map:{A:'MA',B:'EL',C:'ED',D:'CM',E:'IS'}, opts:{A:'Batería y conexiones',B:'Fusibles/circuito de arranque',C:'Rutina de mantención preventiva',D:'Soporte metálico para batería',E:'Mangueras/estanque por fugas/derrames'} },
+  ];
+
+  // ====== Render dinámico con "required" ======
+  function renderLikert(containerId, items){
+    const host = document.querySelector(containerId);
+    items.forEach(([n, text, spec])=>{
+      const q = document.createElement('div');
+      q.className = 'q';
+      q.innerHTML = `
+        <div class="q-head"><div><b>${n}.</b> ${text}</div></div>
+        <div class="q-body likert" role="radiogroup" aria-label="${n}">
+          ${[1,2,3,4,5].map((v,idx)=>`
+            <label>
+              <input type="radio" name="q${n}" value="${v}" ${idx===0?'required':''} />
+              <span>${v}</span>
+            </label>
+          `).join('')}
+        </div>`;
+      host.appendChild(q);
+    });
+  }
+
+  function renderMulti(containerId, items, namePrefix){
+    const host = document.querySelector(containerId);
+    items.forEach((qObj)=>{
+      const {n, text, opts} = qObj;
+      const q = document.createElement('div');
+      q.className = 'q';
+      q.innerHTML = `
+        <div class="q-head"><div><b>${namePrefix}${n}.</b> ${text}</div></div>
+        <div class="q-body options" role="radiogroup" aria-label="${namePrefix}${n}">
+          ${['A','B','C','D','E'].filter(k=>opts[k]).map((k,idx)=>`
+            <label class="row" style="gap:10px; align-items:center">
+              <input type="radio" name="${namePrefix}${n}" value="${k}" ${idx===0?'required':''} />
+              <span><b>${k})</b> ${opts[k]}</span>
+            </label>
+          `).join('')}
+        </div>`;
+      host.appendChild(q);
+    });
+  }
+
+  renderLikert('#parteA', A_ITEMS);
+  renderLikert('#parteB', B_ITEMS);
+  renderMulti('#parteC', C_ITEMS, 'C');
+  renderMulti('#parteD', D_ITEMS, 'D');
+
+  // ====== Utilidades ======
+  function scrollToEl(sel){ document.querySelector(sel)?.scrollIntoView({behavior:'smooth'}); }
+  function getRadio(name){ const el = document.querySelector(`input[name="${name}"]:checked`); return el?el.value:null; }
+  function countAnswered(){
+    let total=0; for(let i=1;i<=20;i++){ if(getRadio('q'+i)) total++; }
+    for(let i=21;i<=35;i++){ if(getRadio('q'+i)) total++; }
+    for(let i=1;i<=10;i++){ if(getRadio('C'+i)) total++; }
+    for(let i=1;i<=5;i++){ if(getRadio('D'+i)) total++; }
+    document.getElementById('progBar').style.width = Math.round(100*total/50)+"%";
+    document.getElementById('progText').textContent = `${total}/50 respondidas`;
+  }
+  document.addEventListener('change', (e)=>{ if(e.target.matches('input[type="radio"]')) countAnswered(); });
+
+  function resetAll(){
+    document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+    document.getElementById('nombre').value='';
+    document.getElementById('curso').value='';
+    document.getElementById('email').value='';
+    countAnswered();
+    document.getElementById('scores').innerHTML='';
+    document.getElementById('semaforos').innerHTML='';
+    document.getElementById('dprefs').innerHTML='';
+    document.getElementById('top3').innerHTML='';
+    document.getElementById('sendStatus').innerHTML='';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function saveJSON(){
+    const data = gatherData();
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    const nombre = (document.getElementById('nombre').value||'estudiante').replaceAll(' ','_');
+    a.href = URL.createObjectURL(blob);
+    a.download = `respuestas_test_tp_${nombre}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  function gatherData(){
+    const A={}, B={}, C={}, D={};
+    for(let i=1;i<=20;i++){ A[i] = getRadio('q'+i); }
+    for(let i=21;i<=35;i++){ B[i] = getRadio('q'+i); }
+    for(let i=1;i<=10;i++){ C[i] = getRadio('C'+i); }
+    for(let i=1;i<=5;i++){ D[i] = getRadio('D'+i); }
+    return {
+      nombre: document.getElementById('nombre').value || null,
+      curso:  document.getElementById('curso').value  || null,
+      email:  document.getElementById('email').value  || null,
+      A, B, C, D,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // ====== Validación, cálculo y envío ======
+  function validateAll(){
+    const form = document.getElementById('testForm');
+    if(!form.reportValidity()) return false; // valida required
+
+    const missing=[];
+    for(let i=1;i<=20;i++) if(!getRadio('q'+i)) missing.push('A'+i);
+    for(let i=21;i<=35;i++) if(!getRadio('q'+i)) missing.push('B'+i);
+    for(let i=1;i<=10;i++) if(!getRadio('C'+i)) missing.push('C'+i);
+    for(let i=1;i<=5;i++) if(!getRadio('D'+i)) missing.push('D'+i);
+    document.querySelectorAll('.danger').forEach(n=>n.classList.remove('danger'));
+    if(missing.length){
+      missing.slice(0,20).forEach(tag=>{
+        const id = tag.startsWith('A')||tag.startsWith('B') ? 'q'+parseInt(tag.replace(/[^0-9]/g,'')) : tag;
+        const input = document.querySelector(`input[name="${id}"]`);
+        if(input) input.closest('.q').classList.add('danger');
+      });
+      alert('Faltan respuestas: '+missing.slice(0,8).join(', ')+(missing.length>8?'…':''));
+      return false;
+    }
+    return true;
+  }
+
+  function calcular(){
+    const totals = {CM:0,IS:0,ED:0,EL:0,MA:0};
+    const dpref  = {CM:0,IS:0,ED:0,EL:0,MA:0};
+    A_ITEMS.forEach(([n,_t,s])=> totals[s]+= +getRadio('q'+n));
+    B_ITEMS.forEach(([n,_t,s])=> totals[s]+= +getRadio('q'+n));
+    C_ITEMS.forEach(({n,key,spec})=>{ const ans=getRadio('C'+n); if(ans && ans.toUpperCase()===key) totals[spec]+=2; });
+    D_ITEMS.forEach(({n,map})=>{ const ans=getRadio('D'+n); const sp=map[ans]; if(sp){ totals[sp]+=3; dpref[sp]+=3; } });
+
+    const arr = Object.keys(SPEC).map(k=>({k, name:SPEC[k].name, total:totals[k], tie:dpref[k]}));
+    arr.sort((a,b)=> (b.total-a.total) || (b.tie-a.tie));
+    const top = arr.slice(0,3);
+
+    renderResults(totals, dpref, top);
+    return { totals, dpref, top };
+  }
+
+  function renderResults(totals, dpref, top){
+    const max=54; const scores=document.getElementById('scores'); scores.innerHTML='';
+    Object.keys(SPEC).forEach(k=>{
+      const row=document.createElement('div');
+      const pct=Math.max(0,Math.min(100,Math.round(100*totals[k]/max)));
+      row.style.marginBottom='10px';
+      row.innerHTML=`
+        <div style=\"display:flex; justify-content:space-between; align-items:center\">
+          <div>${SPEC[k].name}</div>
+          <div><b>${totals[k]}</b> / ${max}</div>
+        </div>
+        <div class=\"bar\" aria-label=\"${SPEC[k].name}\"><i style=\"width:${pct}%;\"></i></div>`;
+      scores.appendChild(row);
+    });
+
+    const sema=document.getElementById('semaforos'); sema.innerHTML='';
+    Object.keys(SPEC).forEach(k=>{
+      const v=totals[k]; let tagTxt,cls; if(v>=42){tagTxt='Alta';cls='alta'} else if(v>=34){tagTxt='Buena';cls='buena'} else if(v>=26){tagTxt='En exploración';cls='explo'} else {tagTxt='Baja';cls='baja'}
+      const item=document.createElement('div'); item.style.display='flex'; item.style.justifyContent='space-between'; item.style.marginBottom='8px';
+      item.innerHTML=`<span>${SPEC[k].name}</span> <span class=\"tag ${cls}\">${tagTxt}</span>`; sema.appendChild(item);
+    });
+
+    const dbox=document.getElementById('dprefs'); dbox.innerHTML='';
+    Object.keys(SPEC).forEach(k=>{ const item=document.createElement('div'); item.style.display='flex'; item.style.justifyContent='space-between'; item.style.marginBottom='8px'; item.innerHTML=`<span>${SPEC[k].name}</span> <span>${dpref[k]}</span>`; dbox.appendChild(item); });
+
+    const top3=document.getElementById('top3'); top3.innerHTML='';
+    top.forEach((t,idx)=>{ const c=document.createElement('div'); c.className='tcard'; c.innerHTML=`<h4>${idx+1}° — ${t.name}</h4><div class=\"small\">Puntaje: <b>${t.total}</b> (desempate D: ${t.tie})</div>`; top3.appendChild(c); });
+  }
+
+  async function handleSubmit(ev){
+    ev.preventDefault();
+    if(!validateAll()) return;
+    const result = calcular();
+    await sendEmail(result);
+    scrollToEl('#resumen');
+  }
+
+  async function sendEmail(result){
+    const status = document.getElementById('sendStatus');
+    status.textContent = 'Enviando resultados al correo institucional…'; status.className='small';
+
+    const student = {
+      nombre: document.getElementById('nombre').value.trim(),
+      curso:  document.getElementById('curso').value,
+      email:  document.getElementById('email').value.trim()
+    };
+
+    const payload = {
+      to: EMAIL_TO,
+      subject: `Resultados Test Orientación TP — ${student.nombre} (${student.curso})`,
+      student,
+      totals: result.totals,
+      dpref: result.dpref,
+      top3: result.top.map(t=>({ especialidad:t.name, puntaje:t.total, desempateD:t.tie })),
+      timestamp: new Date().toISOString()
+    };
+
+    try{
+      if(EMAIL_ENDPOINT){
+        const res = await fetch(EMAIL_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if(!res.ok) throw new Error('Endpoint respondió con error');
+        status.textContent = 'Resultados enviados correctamente a '+EMAIL_TO; status.className='small okmsg';
+        return;
+      }
+      if(EMAILJS_CONF.ENABLED && window.emailjs){
+        emailjs.init(EMAILJS_CONF.PUBLIC_KEY);
+        await emailjs.send(EMAILJS_CONF.SERVICE_ID, EMAILJS_CONF.TEMPLATE_ID, {
+          to_email: EMAIL_TO,
+          subject: payload.subject,
+          nombre: student.nombre,
+          curso: student.curso,
+          correo_estudiante: student.email,
+          totals: JSON.stringify(result.totals),
+          dpref: JSON.stringify(result.dpref),
+          top3: JSON.stringify(payload.top3),
+          timestamp: payload.timestamp
+        });
+        status.textContent = 'Resultados enviados correctamente a '+EMAIL_TO; status.className='small okmsg';
+        return;
+      }
+      // Fallback: abrir cliente de correo local con resumen
+      const body = encodeURIComponent(
+        `Nombre: ${student.nombre}%0D%0ACurso: ${student.curso}%0D%0AEmail estudiante: ${student.email}%0D%0A%0D%0A`+
+        `Totales:%0D%0A`+
+        Object.keys(result.totals).map(k=>`- ${SPEC[k].name}: ${result.totals[k]}`).join('%0D%0A')+
+        `%0D%0A%0D%0ATop 3:%0D%0A`+
+        result.top.map((t,i)=>`${i+1}) ${t.name} — ${t.total} (D: ${t.tie})`).join('%0D%0A')
+      );
+      window.location.href = `mailto:${EMAIL_TO}?subject=${encodeURIComponent(payload.subject)}&body=${body}`;
+      status.textContent = 'Se abrió tu cliente de correo con el resumen listo para enviar.'; status.className='small';
+    }catch(err){
+      console.error(err);
+      status.textContent = 'No se pudo enviar automáticamente. Revisa la configuración de EMAIL_ENDPOINT o EmailJS.';
+      status.className='small errmsg';
+    }
+  }
+
+  // Inicializa progreso
+  countAnswered();
+</script>
+
+<!--
+Guía rápida para activar el envío automático (recomendado Apps Script):
+1) En Google Drive, crea un Apps Script nuevo y pega:
+
+function doPost(e){
+  var data = JSON.parse(e.postData.contents);
+  var to = data.to || 'ebellor@industrialfenner.cl';
+  var subject = data.subject || 'Resultados Test TP';
+  var body = 'Nombre: '+data.student.nombre+'
+Curso: '+data.student.curso+'
+Email estudiante: '+data.student.email+'
+
+Totales:
+';
+  for (var k in data.totals){ body += '- '+k+': '+data.totals[k]+'
+'; }
+  body += '
+Top 3:
+';
+  data.top3.forEach(function(t,i){ body += (i+1)+') '+t.especialidad+' — '+t.puntaje+' (D: '+t.desempateD+')
+'; });
+  MailApp.sendEmail({to:to, subject:subject, body:body});
+  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+}
+
+2) Implementar → Implementar como aplicación web → Cualquiera con el enlace → Copia la URL y pégala en EMAIL_ENDPOINT.
+3) (Alternativa) EmailJS: rellena EMAILJS_CONF y crea una plantilla con campos: to_email, subject, nombre, curso, correo_estudiante, totals, dpref, top3, timestamp.
+-->
+</body>
+</html>
